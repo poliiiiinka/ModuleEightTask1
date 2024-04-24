@@ -13,37 +13,42 @@
             var FolderName = Console.ReadLine();
             var dir = new DirectoryInfo(FolderName);
 
-            try
+            if (Directory.Exists(FolderName))
             {
-                foreach (FileInfo file in dir.GetFiles())
+                try
                 {
-                    /// проверяем время последнего обращения к файлу
-                    if (DateTime.Now - file.LastAccessTime >= TimeSpan.FromMinutes(30))
+                    foreach (FileInfo file in dir.GetFiles())
                     {
-                        file.Delete();
-                        Console.WriteLine($"Файл {file.Name} удалён");
+                        /// проверяем время последнего обращения к файлу
+                        if (DateTime.Now - file.LastAccessTime >= TimeSpan.FromMinutes(30))
+                        {
+                            file.Delete();
+                            Console.WriteLine($"Файл {file.Name} удалён");
+                        }
+                        else
+                            Console.WriteLine($"Не удалось удалить файл {file.Name}");
                     }
-                    else
-                        Console.WriteLine($"Не удалось удалить файл {file.Name}");
+
+                    foreach (DirectoryInfo direct in dir.GetDirectories())
+                    {
+                        /// проверяем время последнего обращения к папке
+                        if (DateTime.Now - direct.LastAccessTime >= TimeSpan.FromMinutes(30))
+                        {
+                            direct.Delete(true); /// удаление папки со всем содержимым
+                            Console.WriteLine($"Папка {direct.Name} удалена");
+                        }
+                        else
+                            Console.WriteLine($"Не удалось удалить папку {direct.Name}");
+                    }
                 }
 
-                foreach (DirectoryInfo direct in dir.GetDirectories())
+                catch (Exception ex)
                 {
-                    /// проверяем время последнего обращения к папке
-                    if (DateTime.Now - direct.LastAccessTime >= TimeSpan.FromMinutes(30))
-                    {
-                        direct.Delete(true); /// удаление папки со всем содержимым
-                        Console.WriteLine($"Папка {direct.Name} удалена");
-                    }
-                    else
-                        Console.WriteLine($"Не удалось удалить папку {direct.Name}");
+                    Console.WriteLine($"Не удалось удалить папку: {ex}");
                 }
             }
-
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Не удалось удалить папку: {ex}");
-            }
+            else
+                Console.WriteLine("Папка не найдена!");
         }
     }
 }
